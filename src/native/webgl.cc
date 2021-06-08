@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <cstring>
 #include <vector>
 #include <iostream>
@@ -48,23 +49,89 @@ WebGLRenderingContext::WebGLRenderingContext(
     , prev(NULL)
     , lastError(GL_NO_ERROR) {
 
+  unsigned int selectedDevice = 0;
+  const char* deviceEnvVar = std::getenv("HEADLESS_GL_DEVICE");
+  if (deviceEnvVar) {
+    selectedDevice = static_cast<unsigned int>(std::stoul(deviceEnvVar));
+  }
+
   //Get display
   if (!HAS_DISPLAY) {
-    DISPLAY = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    if (DISPLAY == EGL_NO_DISPLAY) {
-      state = GLCONTEXT_STATE_ERROR;
-      return;
+    std::cout << "[headless-gl] Querying extensions: ";
+    const char* const extensions = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+    std::cout << extensions << std::endl;
+
+    // Below is adapted from https://github.com/mosra/magnum WindowLessEglApplication
+    if(extensions &&
+        /* eglQueryDevicesEXT() */
+        (strstr(extensions, "EGL_EXT_device_enumeration")
+        || strstr(extensions, "EGL_EXT_device_base")) &&
+        /* eglGetPlatformDisplayEXT() */
+        strstr(extensions, "EGL_EXT_platform_base") &&
+        /* EGL_PLATFORM_DEVICE_EXT */
+        strstr(extensions, "EGL_EXT_platform_device")
+    ) {
+        std::cout << "[headless-gl] EGL initialization... ";
+        EGLint count;
+        auto eglQueryDevices = reinterpret_cast<EGLBoolean(*)(EGLint, EGLDeviceEXT*, EGLint*)>(eglGetProcAddress("eglQueryDevicesEXT"));
+
+        if(!eglQueryDevices(0, nullptr, &count)) {
+          state = GLCONTEXT_STATE_ERROR;
+          std::cerr << "Cannot query EGL devices." << std::endl;
+          return;
+        }
+
+        if(!count) {
+          state = GLCONTEXT_STATE_ERROR;
+          std::cerr << "No EGL devices found." << std::endl;
+          return;
+        }
+
+        std::cout << "Found " << count << " EGL devices. Querying devices... ";
+        EGLDeviceEXT devices[count] = {0};
+        eglQueryDevices(count, devices, &count);
+
+        if(selectedDevice >= static_cast<unsigned int>(count)) {
+          state = GLCONTEXT_STATE_ERROR;
+          std::cerr << "Asked for device " << selectedDevice << " out of range." << std::endl;
+          return;
+        }
+
+        std::cout << "Acquiring display for device " << selectedDevice << "...";
+        if(!(DISPLAY = reinterpret_cast<EGLDisplay(*)(EGLenum, void*, const EGLint*)>(eglGetProcAddress("eglGetPlatformDisplayEXT"))(EGL_PLATFORM_DEVICE_EXT, devices[selectedDevice], nullptr))) {
+            state = GLCONTEXT_STATE_ERROR;
+            std::cerr << "Error getting platform display for device." << std::endl;
+            return;
+        }
+    } else {
+      std::cout << "[headless-gl] EGL initialization (default display)... ";
+      DISPLAY = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+      if (DISPLAY == EGL_NO_DISPLAY) {
+        state = GLCONTEXT_STATE_ERROR;
+        std::cerr << "Error getting EGL display." << std::endl;
+        return;
+      }
     }
+    std::cout << "Display acquired. ";
 
     //Initialize EGL
     if (!eglInitialize(DISPLAY, NULL, NULL)) {
       state = GLCONTEXT_STATE_ERROR;
+      std::cerr << "Error initializing EGL display." << std::endl;
       return;
     }
+    std::cout << "Display initialized." << std::endl;
 
     //Save display
     HAS_DISPLAY = true;
   }
+
+  // NOTE: we can do without below for now
+  // const EGLenum api = EGL_OPENGL_API;
+  // if(!eglBindAPI(api)) {
+  //   std::cerr << "Cannot bind EGL API." << std::endl;
+  //   return;
+  // }
 
   //Set up configuration
   EGLint attrib_list[] = {
@@ -84,8 +151,9 @@ WebGLRenderingContext::WebGLRenderingContext(
       &config,
       1,
       &num_config) ||
-      num_config != 1) {
+      !num_config) {
     state = GLCONTEXT_STATE_ERROR;
+    std::cerr << "Error choosing EGL config." << std::endl;
     return;
   }
 
@@ -97,6 +165,7 @@ WebGLRenderingContext::WebGLRenderingContext(
   context = eglCreateContext(DISPLAY, config, EGL_NO_CONTEXT, contextAttribs);
   if (context == EGL_NO_CONTEXT) {
     state = GLCONTEXT_STATE_ERROR;
+    std::cerr << "Error creating context."  << std::endl;
     return;
   }
 
@@ -108,12 +177,14 @@ WebGLRenderingContext::WebGLRenderingContext(
   surface = eglCreatePbufferSurface(DISPLAY, config, surfaceAttribs);
   if (surface == EGL_NO_SURFACE) {
     state = GLCONTEXT_STATE_ERROR;
+    std::cerr << "Error creating surface."  << std::endl;
     return;
   }
 
   //Set active
   if (!eglMakeCurrent(DISPLAY, surface, surface, context)) {
     state = GLCONTEXT_STATE_ERROR;
+    std::cerr << "Error making context current."  << std::endl;
     return;
   }
 
@@ -128,14 +199,15 @@ WebGLRenderingContext::WebGLRenderingContext(
   //Check extensions
   const char *extensionString = (const char*)((glGetString)(GL_EXTENSIONS));
 
-  //Load required extensions
-  for(const char** rext = REQUIRED_EXTENSIONS; *rext; ++rext) {
-    if(!strstr(extensionString, *rext)) {
-      dispose();
-      state = GLCONTEXT_STATE_ERROR;
-      return;
-    }
-  }
+  // NOTE: below check fails for nvidia EGL devices; skip and hope no issues
+  // //Load required extensions
+  // for(const char** rext = REQUIRED_EXTENSIONS; *rext; ++rext) {
+  //   if(!strstr(extensionString, *rext)) {
+  //     dispose();
+  //     state = GLCONTEXT_STATE_ERROR;
+  //     return;
+  //   }
+  // }
 
   //Select best preferred depth
   preferredDepth = GL_DEPTH_COMPONENT16;

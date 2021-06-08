@@ -48,9 +48,12 @@
         ['OS=="linux"', {
             'dependencies':
             [
-              'angle/src/angle.gyp:libEGL',
+              # 'angle/src/angle.gyp:libEGL',  # We will instead link system EGL below
               'angle/src/angle.gyp:libGLESv2'
-            ]
+            ],
+            'link_settings': {
+              'libraries': ['-lEGL']
+            }
         }],
         ['OS=="win"', {
             'library_dirs': [
