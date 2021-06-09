@@ -54,12 +54,26 @@ WebGLRenderingContext::WebGLRenderingContext(
   if (deviceEnvVar) {
     selectedDevice = static_cast<unsigned int>(std::stoul(deviceEnvVar));
   }
+  const char* verboseEnvVar = std::getenv("HEADLESS_GL_VERBOSE");
+  int verbose = 0;
+  if (verboseEnvVar) {
+    verbose = 1;
+  }
+
+  auto log = [&](const std::string& output, bool endline = false) {
+    if (verbose) {
+      std::cout << output;
+      if (endline) {
+        std::cout << std::endl;
+      }
+    }
+  };
 
   //Get display
   if (!HAS_DISPLAY) {
-    std::cout << "[headless-gl] Querying extensions: ";
+    log("[headless-gl] Querying extensions: ");
     const char* const extensions = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-    std::cout << extensions << std::endl;
+    log(extensions, true);
 
     // Below is adapted from https://github.com/mosra/magnum WindowLessEglApplication
     if(extensions &&
@@ -71,7 +85,7 @@ WebGLRenderingContext::WebGLRenderingContext(
         /* EGL_PLATFORM_DEVICE_EXT */
         strstr(extensions, "EGL_EXT_platform_device")
     ) {
-        std::cout << "[headless-gl] EGL initialization... ";
+        log("[headless-gl] EGL initialization... ");
         EGLint count;
         auto eglQueryDevices = reinterpret_cast<EGLBoolean(*)(EGLint, EGLDeviceEXT*, EGLint*)>(eglGetProcAddress("eglQueryDevicesEXT"));
 
@@ -87,9 +101,9 @@ WebGLRenderingContext::WebGLRenderingContext(
           return;
         }
 
-        std::cout << "Found " << count << " EGL devices. Querying devices... ";
-        EGLDeviceEXT devices[count] = {0};
-        eglQueryDevices(count, devices, &count);
+        log("Found " + std::to_string(count) + " EGL devices. Querying devices... ");
+        std::vector<EGLDeviceEXT> devices(count);
+        eglQueryDevices(devices.size(), &devices[0], &count);
 
         if(selectedDevice >= static_cast<unsigned int>(count)) {
           state = GLCONTEXT_STATE_ERROR;
@@ -97,14 +111,14 @@ WebGLRenderingContext::WebGLRenderingContext(
           return;
         }
 
-        std::cout << "Acquiring display for device " << selectedDevice << "...";
+        log("Acquiring display for device " + std::to_string(selectedDevice) + "...");
         if(!(DISPLAY = reinterpret_cast<EGLDisplay(*)(EGLenum, void*, const EGLint*)>(eglGetProcAddress("eglGetPlatformDisplayEXT"))(EGL_PLATFORM_DEVICE_EXT, devices[selectedDevice], nullptr))) {
             state = GLCONTEXT_STATE_ERROR;
             std::cerr << "Error getting platform display for device." << std::endl;
             return;
         }
     } else {
-      std::cout << "[headless-gl] EGL initialization (default display)... ";
+      log("[headless-gl] EGL initialization (default display)... ");
       DISPLAY = eglGetDisplay(EGL_DEFAULT_DISPLAY);
       if (DISPLAY == EGL_NO_DISPLAY) {
         state = GLCONTEXT_STATE_ERROR;
@@ -112,7 +126,7 @@ WebGLRenderingContext::WebGLRenderingContext(
         return;
       }
     }
-    std::cout << "Display acquired. ";
+    log("Display acquired. ");
 
     //Initialize EGL
     if (!eglInitialize(DISPLAY, NULL, NULL)) {
@@ -120,7 +134,7 @@ WebGLRenderingContext::WebGLRenderingContext(
       std::cerr << "Error initializing EGL display." << std::endl;
       return;
     }
-    std::cout << "Display initialized." << std::endl;
+    log("Display initialized.", true);
 
     //Save display
     HAS_DISPLAY = true;
@@ -216,6 +230,9 @@ WebGLRenderingContext::WebGLRenderingContext(
   } else if(strstr(extensionString, "GL_OES_depth24")) {
     preferredDepth = GL_DEPTH_COMPONENT24_OES;
   }
+  // Report vendor string
+  const std::string vendorString = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+  log("[headless-gl] Created context on device with vendor string: " + vendorString, true);
 }
 
 bool WebGLRenderingContext::setActive() {
