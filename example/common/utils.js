@@ -1,29 +1,29 @@
-var fs = require('fs')
+const fs = require('fs')
 
 function bufferToStdout (gl, width, height) {
   // Write output
-  var pixels = new Uint8Array(width * height * 4)
+  const pixels = new Uint8Array(width * height * 4)
   gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
   process.stdout.write(['P3\n# gl.ppm\n', width, ' ', height, '\n255\n'].join(''))
-  for (var i = 0; i < pixels.length; i += 4) {
+  for (let i = 0; i < pixels.length; i += 4) {
     process.stdout.write(pixels[i] + ' ' + pixels[i + 1] + ' ' + pixels[i + 2] + ' ')
   }
 }
 
 function bufferToFile (gl, width, height, filename) {
-  var file = fs.createWriteStream(filename)
+  const file = fs.createWriteStream(filename)
 
   // Write output
-  var pixels = new Uint8Array(width * height * 4)
+  const pixels = new Uint8Array(width * height * 4)
   gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
   file.write(['P3\n# gl.ppm\n', width, ' ', height, '\n255\n'].join(''))
-  for (var i = 0; i < pixels.length; i += 4) {
+  for (let i = 0; i < pixels.length; i += 4) {
     file.write(pixels[i] + ' ' + pixels[i + 1] + ' ' + pixels[i + 2] + ' ')
   }
 }
 
 function drawTriangle (gl) {
-  var buffer = gl.createBuffer()
+  const buffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-2, -2, -2, 4, 4, -2]), gl.STREAM_DRAW)
   gl.enableVertexAttribArray(0)
@@ -35,15 +35,15 @@ function drawTriangle (gl) {
 }
 
 function loadShader (gl, shaderSource, shaderType) {
-  var shader = gl.createShader(shaderType)
+  const shader = gl.createShader(shaderType)
   gl.shaderSource(shader, shaderSource)
   gl.compileShader(shader)
 
   // Check the compile status
-  var compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
+  const compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
   if (!compiled) {
     // Something went wrong during compilation; get the error
-    var lastError = gl.getShaderInfoLog(shader)
+    const lastError = gl.getShaderInfoLog(shader)
     console.log("*** Error compiling shader '" + shader + "':" + lastError)
     gl.deleteShader(shader)
     return null
@@ -53,7 +53,7 @@ function loadShader (gl, shaderSource, shaderType) {
 }
 
 function createProgram (gl, shaders, optAttribs, optLocations) {
-  var program = gl.createProgram()
+  const program = gl.createProgram()
   shaders.forEach(function (shader) {
     gl.attachShader(program, shader)
   })
@@ -68,10 +68,10 @@ function createProgram (gl, shaders, optAttribs, optLocations) {
   gl.linkProgram(program)
 
   // Check the link status
-  var linked = gl.getProgramParameter(program, gl.LINK_STATUS)
+  const linked = gl.getProgramParameter(program, gl.LINK_STATUS)
   if (!linked) {
     // something went wrong with the link
-    var lastError = gl.getProgramInfoLog(program)
+    const lastError = gl.getProgramInfoLog(program)
     console.log('Error in program linking:' + lastError)
 
     gl.deleteProgram(program)
@@ -81,13 +81,13 @@ function createProgram (gl, shaders, optAttribs, optLocations) {
 }
 
 function createProgramFromSources (gl, shaderSources, optAttribs, optLocations) {
-  var defaultShaderType = [
+  const defaultShaderType = [
     'VERTEX_SHADER',
     'FRAGMENT_SHADER'
   ]
 
-  var shaders = []
-  for (var ii = 0; ii < shaderSources.length; ++ii) {
+  const shaders = []
+  for (let ii = 0; ii < shaderSources.length; ++ii) {
     shaders.push(loadShader(gl, shaderSources[ii], gl[defaultShaderType[ii]]))
   }
   return createProgram(gl, shaders, optAttribs, optLocations)

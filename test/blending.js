@@ -1,19 +1,19 @@
 'use strict'
 
-var tape = require('tape')
-var createContext = require('../index')
-var drawTriangle = require('./util/draw-triangle')
-var makeShader = require('./util/make-program')
+const tape = require('tape')
+const createContext = require('../index')
+const drawTriangle = require('./util/draw-triangle')
+const makeShader = require('./util/make-program')
 
-var width = 2
-var height = 2
-var gl = createContext(width, height)
+const width = 2
+const height = 2
+const gl = createContext(width, height)
 
-var getVec4 = function (array) {
+const getVec4 = function (array) {
   return 'vec4(' + array[0] + ',' + array[1] + ',' + array[2] + ',' + array[3] + ');'
 }
 
-var tests = [
+const tests = [
   {
     name: 'Blend: ADD ONE ONE',
     equn: gl.FUNC_ADD,
@@ -65,10 +65,10 @@ var tests = [
   }
 ]
 
-for (var j = 0; j < tests.length; j++) {
-  var test = tests[j]
+for (let j = 0; j < tests.length; j++) {
+  const test = tests[j]
   tape(test.name, function (t) {
-    var vertexSrc = [
+    const vertexSrc = [
       'precision mediump float;',
       'attribute vec2 position;',
       'void main() {',
@@ -76,7 +76,7 @@ for (var j = 0; j < tests.length; j++) {
       '}'
     ].join('\n')
 
-    var fragmentSrc = [
+    const fragmentSrc = [
       'precision mediump float;',
       'void main() {',
       'gl_FragColor = ' + test.srcColor,
@@ -86,7 +86,7 @@ for (var j = 0; j < tests.length; j++) {
     gl.clearColor(test.dstColor[0], test.dstColor[1], test.dstColor[2], test.dstColor[3])
     gl.clear(gl.COLOR_BUFFER_BIT)
 
-    var program = makeShader(gl, vertexSrc, fragmentSrc)
+    const program = makeShader(gl, vertexSrc, fragmentSrc)
 
     gl.useProgram(program)
 
@@ -100,10 +100,10 @@ for (var j = 0; j < tests.length; j++) {
 
     gl.disable(gl.BLEND)
 
-    var pixels = new Uint8Array(width * height * 4)
+    const pixels = new Uint8Array(width * height * 4)
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
 
-    for (var i = 0; i < width * height * 4; i += 4) {
+    for (let i = 0; i < width * height * 4; i += 4) {
       t.ok(Math.abs(pixels[i] - test.expectedColor[0] * 255) < 3, 'red')
       t.ok(Math.abs(pixels[i] - test.expectedColor[0] * 255) < 3, 'green')
       t.ok(Math.abs(pixels[i] - test.expectedColor[0] * 255) < 3, 'blue')

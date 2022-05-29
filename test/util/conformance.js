@@ -1,6 +1,6 @@
-var tape = require('tape')
-var runConformance = require('gl-conformance')
-var createContext = require('../../index')
+const tape = require('tape')
+const runConformance = require('gl-conformance')
+const createContext = require('../../index')
 
 // Inject WebGL types into global namespaces, required by some conformance tests
 WebGLRenderingContext = require('../../src/javascript/webgl-rendering-context').WebGLRenderingContext // eslint-disable-line
@@ -17,13 +17,13 @@ WebGLContextAttributes = require('../../src/javascript/webgl-context-attributes'
 
 module.exports = function (filter) {
   return runConformance({
-    tape: tape,
+    tape,
     createContext: function (width, height, options) {
-      var context = createContext(width, height, options)
+      const context = createContext(width, height, options)
       context.destroy = context.getExtension('STACKGL_destroy_context').destroy
       context.resize = context.getExtension('STACKGL_resize_drawingbuffer').resize
       return context
     },
-    filter: filter
+    filter
   })
 }

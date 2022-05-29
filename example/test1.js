@@ -1,27 +1,27 @@
-var createContext = require('../index')
-var utils = require('./utils')
+const createContext = require('../index')
+const utils = require('./utils')
 
 function main () {
   // Create context
-  var width = 64
-  var height = 64
-  var gl = createContext(width, height)
+  const width = 64
+  const height = 64
+  const gl = createContext(width, height)
 
-  var vertexSrc = [
+  const vertexSrc = [
     'attribute vec2 a_position;',
     'void main() {',
     'gl_Position = vec4(a_position, 0, 1);',
     '}'
   ].join('\n')
 
-  var fragmentSrc = [
+  const fragmentSrc = [
     'void main() {',
     'gl_FragColor = vec4(0, 1, 0, 1);  // green',
     '}'
   ].join('\n')
 
   // setup a GLSL program
-  var program = utils.createProgramFromSources(gl, [vertexSrc, fragmentSrc])
+  const program = utils.createProgramFromSources(gl, [vertexSrc, fragmentSrc])
 
   if (!program) {
     return
@@ -29,11 +29,11 @@ function main () {
   gl.useProgram(program)
 
   // look up where the vertex data needs to go.
-  var positionLocation = gl.getAttribLocation(program, 'a_position')
+  const positionLocation = gl.getAttribLocation(program, 'a_position')
 
   // Create a buffer and put a single clipspace rectangle in
   // it (2 triangles)
-  var buffer = gl.createBuffer()
+  const buffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.bufferData(
     gl.ARRAY_BUFFER,

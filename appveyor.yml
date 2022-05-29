@@ -2,11 +2,11 @@ platform:
   - x64
 
 environment:
-  GITHUB_TOKEN:
-    secure: 8dsj2oODP6p82OsCyVjldh0v/KktBJYWWPFWmrg+bh7y0CNpQPwtww+IjX14LMrx
   matrix:
-  - nodejs_version: "12"
-  - nodejs_version: "14"
+  # - nodejs_version: "12"
+  # - nodejs_version: "14"
+  # - nodejs_version: "16"
+  - nodejs_version: "18"
 
 install:
   - cmd: git submodule update --init
@@ -23,4 +23,4 @@ test_script:
   - npm test
 
 deploy_script:
-  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") {./node_modules/.bin/prebuild -t 8.0.0 -t 9.0.0 -t 10.0.0 -t 11.0.0 -t 12.0.0 -t 14.0.0 --strip -u $env:GITHUB_TOKEN --include-regex "\.(node|dll)$"}
+  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") {./node_modules/.bin/prebuild -t 12.0.0 -t 14.0.0 -t 16.0.0 --strip -u $env:GITHUB_TOKEN --include-regex "\.(node|dll)$"}

@@ -9,6 +9,10 @@ function createContext (width, height, options) {
   if (!canvas) {
     return null
   }
+
+  /**
+   * @type WebGLRenderingContext
+   */
   let gl
   canvas.width = width
   canvas.height = height

@@ -1,22 +1,22 @@
 /* globals __line */
-var path = require('path')
-var createContext = require('../../index')
-var utils = require('../common/utils.js')
-var utilsLog = require('../common/utils_log.js')
-var log = new utilsLog.Log(path.basename(__filename), 'DEBUG')
-var bunny = require('bunny')
+const path = require('path')
+const createContext = require('../../index')
+const utils = require('../common/utils.js')
+const utilsLog = require('../common/utils_log.js')
+const log = new utilsLog.Log(path.basename(__filename), 'DEBUG')
+const bunny = require('bunny')
 const normals = require('angle-normals')
 
 // flatten a multi-dimensional array.
 // so [[1,2,3], [2,3,4],...] becomes
 // [1,2,3, 2,3,4]
 function flatten (data) {
-  var result = []
-  var dimension = data[0].length
-  var ptr = 0
-  for (var i = 0; i < data.length; ++i) {
-    var v = data[i]
-    for (var j = 0; j < dimension; ++j) {
+  const result = []
+  const dimension = data[0].length
+  let ptr = 0
+  for (let i = 0; i < data.length; ++i) {
+    const v = data[i]
+    for (let j = 0; j < dimension; ++j) {
       result[ptr++] = v[j]
     }
   }
@@ -25,16 +25,16 @@ function flatten (data) {
 
 function main () {
   // Create context
-  var width = 512
-  var height = 512
-  var gl = createContext(width, height)
+  const width = 512
+  const height = 512
+  const gl = createContext(width, height)
 
   gl.clearColor(0.0, 0.0, 0.0, 1.0)
   gl.enable(gl.DEPTH_TEST)
   gl.enable(gl.CULL_FACE)
   gl.viewport(0, 0, width, height)
 
-  var vertexSrc = `
+  const vertexSrc = `
   precision mediump float;
 
   attribute vec3 position;
@@ -49,7 +49,7 @@ function main () {
   }
   `
 
-  var fragmentSrc = `
+  const fragmentSrc = `
   precision mediump float;
 
   varying vec3 vNormal;
@@ -64,38 +64,38 @@ function main () {
   `
 
   // setup a GLSL program
-  var program = utils.createProgramFromSources(gl, [vertexSrc, fragmentSrc])
+  const program = utils.createProgramFromSources(gl, [vertexSrc, fragmentSrc])
   gl.useProgram(program)
 
   // look up where the vertex data needs to go.
-  var positionLocation = gl.getAttribLocation(program, 'position')
-  var normalLocation = gl.getAttribLocation(program, 'normal')
+  const positionLocation = gl.getAttribLocation(program, 'position')
+  const normalLocation = gl.getAttribLocation(program, 'normal')
 
   // get uniform locations.
-  var projectionUniformLocation = gl.getUniformLocation(program, 'projection')
-  var viewUniformLocation = gl.getUniformLocation(program, 'view')
+  const projectionUniformLocation = gl.getUniformLocation(program, 'projection')
+  const viewUniformLocation = gl.getUniformLocation(program, 'view')
 
   // setup perspective.
-  var perspectiveMatrix = perspective(Math.PI / 4, width / height, 0.01, 1000.0)
+  const perspectiveMatrix = perspective(Math.PI / 4, width / height, 0.01, 1000.0)
   gl.uniformMatrix4fv(projectionUniformLocation, false, new Float32Array(perspectiveMatrix))
 
   // setup view.
-  var m = lookAt([0.0, 12.5, 30.0], [0, 2.5, 0], [0, 1, 0])
+  const m = lookAt([0.0, 12.5, 30.0], [0, 2.5, 0], [0, 1, 0])
   gl.uniformMatrix4fv(viewUniformLocation, false, new Float32Array(m))
 
-  var positionBuffer = gl.createBuffer()
+  const positionBuffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(flatten(bunny.positions)), gl.STATIC_DRAW)
   gl.enableVertexAttribArray(positionLocation)
   gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0)
 
-  var normalBuffer = gl.createBuffer()
+  const normalBuffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer)
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(flatten(normals(bunny.cells, bunny.positions))), gl.STATIC_DRAW)
   gl.enableVertexAttribArray(normalLocation)
   gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0, 0)
 
-  var elementsBuffer = gl.createBuffer()
+  const elementsBuffer = gl.createBuffer()
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementsBuffer)
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(flatten(bunny.cells)), gl.STATIC_DRAW)
 
@@ -112,16 +112,16 @@ function main () {
 // Taken from gl-mat4
 // https://github.com/stackgl/gl-mat4/blob/master/lookAt.js
 function lookAt (eye, center, up) {
-  var x0, x1, x2, y0, y1, y2, z0, z1, z2, len
-  var eyex = eye[0]
-  var eyey = eye[1]
-  var eyez = eye[2]
-  var upx = up[0]
-  var upy = up[1]
-  var upz = up[2]
-  var centerx = center[0]
-  var centery = center[1]
-  var centerz = center[2]
+  let x0, x1, x2, y0, y1, y2, z0, z1, z2, len
+  const eyex = eye[0]
+  const eyey = eye[1]
+  const eyez = eye[2]
+  const upx = up[0]
+  const upy = up[1]
+  const upz = up[2]
+  const centerx = center[0]
+  const centery = center[1]
+  const centerz = center[2]
 
   z0 = eyex - centerx
   z1 = eyey - centery
@@ -174,8 +174,8 @@ function lookAt (eye, center, up) {
 // Taken from gl-mat4
 // https://github.com/stackgl/gl-mat4/blob/master/perspective.js
 function perspective (fovy, aspect, near, far) {
-  var f = 1.0 / Math.tan(fovy / 2)
-  var nf = 1 / (near - far)
+  const f = 1.0 / Math.tan(fovy / 2)
+  const nf = 1 / (near - far)
 
   return [
     f / aspect, 0.0, 0.0, 0.0,

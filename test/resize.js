@@ -1,12 +1,12 @@
 'use strict'
 
-var tape = require('tape')
-var createContext = require('../index')
+const tape = require('tape')
+const createContext = require('../index')
 
 tape('resize', function (t) {
-  var width = 2
-  var height = 2
-  var gl = createContext(width, height)
+  const width = 2
+  const height = 2
+  const gl = createContext(width, height)
 
   function testColor (width, height, r, g, b, a) {
     gl.resize(width, height)
@@ -17,12 +17,12 @@ tape('resize', function (t) {
     gl.clearColor(r / 255, g / 255, b / 255, a / 255)
     gl.clear(gl.COLOR_BUFFER_BIT)
 
-    var pixels = new Uint8Array((width + 2) * (height + 2) * 4)
+    const pixels = new Uint8Array((width + 2) * (height + 2) * 4)
     gl.readPixels(-1, -1, width + 2, height + 2, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
 
-    var ptr = 0
-    for (var row = -1; row <= height; ++row) {
-      for (var col = -1; col <= width; ++col) {
+    let ptr = 0
+    for (let row = -1; row <= height; ++row) {
+      for (let col = -1; col <= width; ++col) {
         if (row < 0 || col < 0 || row === height || col === width) {
           t.equals(pixels[ptr++], 0, 'out of bounds red')
           t.equals(pixels[ptr++], 0, 'out of bounds green')
@@ -35,9 +35,6 @@ tape('resize', function (t) {
           t.equals(pixels[ptr++], a, 'in bounds alpha')
         }
       }
-    }
-
-    for (var i = 0; i < width * height * 4; i += 4) {
     }
   }
 

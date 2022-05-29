@@ -1,4 +1,4 @@
-var BLACKLIST = [
+const BLACKLIST = [
   // FIXME not sure what the hell is happening in these cases
   // ogles tests are completely nutzo impossible to trace :(
   'ogles_GL_array_array_001_to_006',

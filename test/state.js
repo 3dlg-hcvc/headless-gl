@@ -1,4 +1,4 @@
-var BLACKLIST = [
+const BLACKLIST = [
   // This test is fucking broken
   'state_gl-get-calls'
 ]

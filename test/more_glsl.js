@@ -1,4 +1,4 @@
-var BLACKLIST = [
+const BLACKLIST = [
   'more_glsl_arrayOutOfBounds'
 ]
 

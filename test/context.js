@@ -1,4 +1,4 @@
-var BLACKLIST = [
+const BLACKLIST = [
   'context_context-type-test',
   'context_methods'
 ]

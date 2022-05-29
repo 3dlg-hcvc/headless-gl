@@ -1,16 +1,16 @@
 'use strict'
 
-var tape = require('tape')
-var createContext = require('../index')
-var drawTriangle = require('./util/draw-triangle')
-var makeShader = require('./util/make-program')
+const tape = require('tape')
+const createContext = require('../index')
+const drawTriangle = require('./util/draw-triangle')
+const makeShader = require('./util/make-program')
 
 tape('alpha texture', function (t) {
-  var width = 64
-  var height = 64
-  var gl = createContext(width, height)
+  const width = 64
+  const height = 64
+  const gl = createContext(width, height)
 
-  var vertexSrc = [
+  const vertexSrc = [
     'precision mediump float;',
     'attribute vec2 position;',
     'varying vec2 texCoord;',
@@ -20,7 +20,7 @@ tape('alpha texture', function (t) {
     '}'
   ].join('\n')
 
-  var fragmentSrc = [
+  const fragmentSrc = [
     'precision mediump float;',
     'uniform sampler2D tex;',
     'varying vec2 texCoord;',
@@ -32,14 +32,14 @@ tape('alpha texture', function (t) {
   gl.clearColor(0, 0, 0, 0)
   gl.clear(gl.COLOR_BUFFER_BIT)
 
-  var data = new Uint8Array(width * height)
-  for (var i = 0; i < height; ++i) {
-    for (var j = 0; j < width; ++j) {
+  const data = new Uint8Array(width * height)
+  for (let i = 0; i < height; ++i) {
+    for (let j = 0; j < width; ++j) {
       data[width * i + j] = (i + j) % 255
     }
   }
 
-  var texture = gl.createTexture()
+  const texture = gl.createTexture()
   gl.bindTexture(gl.TEXTURE_2D, texture)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
@@ -55,7 +55,7 @@ tape('alpha texture', function (t) {
     gl.UNSIGNED_BYTE,
     data)
 
-  var program = makeShader(gl, vertexSrc, fragmentSrc)
+  const program = makeShader(gl, vertexSrc, fragmentSrc)
 
   gl.useProgram(program)
   gl.uniform1i(gl.getUniformLocation(program, 'tex'), 0)
@@ -63,12 +63,12 @@ tape('alpha texture', function (t) {
 
   t.equals(gl.getError(), gl.NO_ERROR)
 
-  var pixels = new Uint8Array(width * height * 4)
+  const pixels = new Uint8Array(width * height * 4)
   gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
 
   function checkColor () {
-    var ptr = 0
-    for (i = 0; i < width * height * 4; i += 4) {
+    let ptr = 0
+    for (let i = 0; i < width * height * 4; i += 4) {
       if (pixels[i] ||
           pixels[i + 1] ||
           pixels[i + 2] ||

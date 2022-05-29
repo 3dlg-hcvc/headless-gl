@@ -1,4 +1,4 @@
-var BLACKLIST = [
+const BLACKLIST = [
   // BROKEN Uses RGB texture FBOs
   'rendering_framebuffer-texture-switch',
   'rendering_framebuffer-switch',

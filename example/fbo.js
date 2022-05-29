@@ -1,11 +1,11 @@
-var createContext = require('../index')
-var utils = require('./utils.js')
+const createContext = require('../index')
+const utils = require('./utils.js')
 
 function main () {
   // Create context
-  var width = 64
-  var height = 64
-  var gl = createContext(width, height)
+  const width = 64
+  const height = 64
+  const gl = createContext(width, height)
 
   // Clear screen to red
   gl.clearColor(1.0, 0.0, 0.0, 1.0)

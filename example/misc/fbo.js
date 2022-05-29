@@ -1,16 +1,16 @@
 /* globals __line */
 
-var path = require('path')
-var createContext = require('../../index')
-var utils = require('../common/utils.js')
-var utilsLog = require('../common/utils_log.js')
-var log = new utilsLog.Log(path.basename(__filename), 'DEBUG')
+const path = require('path')
+const createContext = require('../../index')
+const utils = require('../common/utils.js')
+const utilsLog = require('../common/utils_log.js')
+const log = new utilsLog.Log(path.basename(__filename), 'DEBUG')
 
 function main () {
   // Create context
-  var width = 512
-  var height = 512
-  var gl = createContext(width, height)
+  const width = 512
+  const height = 512
+  const gl = createContext(width, height)
 
   // Clear screen to red
   gl.clearColor(1.0, 0.0, 0.0, 1.0)

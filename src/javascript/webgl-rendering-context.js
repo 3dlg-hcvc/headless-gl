@@ -2881,21 +2881,22 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
     width |= 0
     height |= 0
 
-    if (this._extensions.oes_texture_float && type === gl.FLOAT && format === gl.RGBA) {
-    } else if (format === gl.RGB ||
-      format === gl.ALPHA ||
-      type !== gl.UNSIGNED_BYTE) {
-      this.setError(gl.INVALID_OPERATION)
-      return
-    } else if (format !== gl.RGBA) {
-      this.setError(gl.INVALID_ENUM)
-      return
-    } else if (
-      width < 0 ||
-      height < 0 ||
-      !(pixels instanceof Uint8Array)) {
-      this.setError(gl.INVALID_VALUE)
-      return
+    if (!(this._extensions.oes_texture_float && type === gl.FLOAT && format === gl.RGBA)) {
+      if (format === gl.RGB ||
+        format === gl.ALPHA ||
+        type !== gl.UNSIGNED_BYTE) {
+        this.setError(gl.INVALID_OPERATION)
+        return
+      } else if (format !== gl.RGBA) {
+        this.setError(gl.INVALID_ENUM)
+        return
+      } else if (
+        width < 0 ||
+        height < 0 ||
+        !(pixels instanceof Uint8Array)) {
+        this.setError(gl.INVALID_VALUE)
+        return
+      }
     }
 
     if (!this._framebufferOk()) {

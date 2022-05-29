@@ -1,11 +1,11 @@
 'use strict'
 
-var tape = require('tape')
-var createContext = require('../index')
+const tape = require('tape')
+const createContext = require('../index')
 
 tape('create context', function (t) {
-  var width = 10
-  var height = 10
+  const width = 10
+  const height = 10
   createContext(width, height)
   t.end()
 })

@@ -1,5 +1,5 @@
 module.exports = function drawTriangle (gl) {
-  var buffer = gl.createBuffer()
+  const buffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-2, -2, -2, 4, 4, -2]), gl.STREAM_DRAW)
   gl.enableVertexAttribArray(0)

@@ -1,4 +1,4 @@
-var BLACKLIST = [
+const BLACKLIST = [
   'glsl_samplers_glsl-function-texture2dprojlod'
 ]
 

@@ -3,31 +3,20 @@ git:
   submodules: true
 env:
   global:
-    - secure: H9lQEk76gGIi0TM9dGSZYmezr+8x4a4HQuwyJ1Z7wnWuW6diWtftfaim85AvjRpNnhpfz5ia6hmzLruOXbjDxCYp2RN9nhebBlGp9iYQsoyzZlTphWVNj0cGC9AIkxEtobswU3/A79FgnMhZxo5vSu4eotTgxo7nyiUaTuKB2nI=
+    - secure: "MHkBPTRLhQ04GgdBNOJvvvHf7gJyrc9aWCznWipB2RUQG+vobxPuOCV+rFFUB4Z/q3Dh54d/61dHs9nwHW/uP1jStwPqW1x19Uhcny+c0WEY6A87wjnUVR4g7pQ7+vzkwg8o2jdBC+8BQ/4M4IQ2nRic5qcB8Z6FCOdL4ENhvA8="
 matrix:
   include:
   - os: linux
     sudo: required
-    dist: trusty
+    dist: focal
     compiler: g++
     env:
-      - NODE_VERSION=12
-  - os: linux
-    sudo: required
-    dist: trusty
-    compiler: g++
-    env:
-      - NODE_VERSION=14
-  - os: osx
-    osx_image: xcode7
-    compiler: clang
-    env:
-      - NODE_VERSION=12
-  - os: osx
-    osx_image: xcode7
-    compiler: clang
-    env:
-      - NODE_VERSION=14
+      - NODE_VERSION=18
+  # - os: osx
+  #   osx_image: xcode12.5
+  #   compiler: clang
+  #   env:
+  #     - NODE_VERSION=18
 addons:
   apt:
     sources:
@@ -43,6 +32,7 @@ addons:
     - libglapi-mesa
     - libosmesa6
     - musl-dev
+    - libgl1-mesa-dev
 before_install:
 - ./scripts/before_install.sh
 install:

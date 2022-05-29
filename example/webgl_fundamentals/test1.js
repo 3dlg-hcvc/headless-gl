@@ -1,17 +1,17 @@
 /* globals __line */
-var path = require('path')
-var createContext = require('../../index')
-var utils = require('../common/utils.js')
-var utilsLog = require('../common/utils_log.js')
-var log = new utilsLog.Log(path.basename(__filename), 'DEBUG')
+const path = require('path')
+const createContext = require('../../index')
+const utils = require('../common/utils.js')
+const utilsLog = require('../common/utils_log.js')
+const log = new utilsLog.Log(path.basename(__filename), 'DEBUG')
 
 function main () {
   // Create context
-  var width = 512
-  var height = 512
-  var gl = createContext(width, height)
+  const width = 512
+  const height = 512
+  const gl = createContext(width, height)
 
-  var vertexSrc = `
+  const vertexSrc = `
   attribute vec2 a_position;
 
   uniform vec2 u_resolution;
@@ -30,26 +30,26 @@ function main () {
   }
   `
 
-  var fragmentSrc = `
+  const fragmentSrc = `
   void main() {
     gl_FragColor = vec4(0, 1, 0, 1);  // green
   }
   `
 
   // setup a GLSL program
-  var program = utils.createProgramFromSources(gl, [vertexSrc, fragmentSrc])
+  const program = utils.createProgramFromSources(gl, [vertexSrc, fragmentSrc])
   gl.useProgram(program)
 
   // look up where the vertex data needs to go.
-  var positionLocation = gl.getAttribLocation(program, 'a_position')
+  const positionLocation = gl.getAttribLocation(program, 'a_position')
 
   // set the resolution
-  var resolutionLocation = gl.getUniformLocation(program, 'u_resolution')
+  const resolutionLocation = gl.getUniformLocation(program, 'u_resolution')
   gl.uniform2f(resolutionLocation, width, height)
 
   // Create a buffer and put a single clipspace rectangle in
   // it (2 triangles)
-  var buffer = gl.createBuffer()
+  const buffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
     10, 20,

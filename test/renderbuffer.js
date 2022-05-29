@@ -1,4 +1,4 @@
-var BLACKLIST = [
+const BLACKLIST = [
   'renderbuffers_feedback-loop',
   'renderbuffers_renderbuffer-initialization'
 ]

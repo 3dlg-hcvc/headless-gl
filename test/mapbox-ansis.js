@@ -1,32 +1,32 @@
-var tape = require('tape')
-var createContext = require('../index')
+const tape = require('tape')
+const createContext = require('../index')
 
 tape('mapbox-ansis', function (t) {
-  var width = 1
-  var height = 1
+  const width = 1
+  const height = 1
 
-  var gl = createContext(width, height)
+  const gl = createContext(width, height)
 
-  var vertexSource = 'precision mediump float;\n' +
+  const vertexSource = 'precision mediump float;\n' +
     'uniform float u_z;\n' +
     'attribute vec2 a_position;\n' +
     'void main() {\n' +
     '   gl_Position = vec4(a_position, u_z, 1);\n' +
     '}'
 
-  var fragmentSource = 'precision mediump float;\n' +
+  const fragmentSource = 'precision mediump float;\n' +
     'uniform vec4 u_color;\n' +
     'void main() {\n' +
     '      gl_FragColor = u_color;  // green\n' +
     '}'
 
-  var vertex = gl.createShader(gl.VERTEX_SHADER)
+  const vertex = gl.createShader(gl.VERTEX_SHADER)
   gl.shaderSource(vertex, vertexSource)
   gl.compileShader(vertex)
-  var fragment = gl.createShader(gl.FRAGMENT_SHADER)
+  const fragment = gl.createShader(gl.FRAGMENT_SHADER)
   gl.shaderSource(fragment, fragmentSource)
   gl.compileShader(fragment)
-  var program = gl.createProgram()
+  const program = gl.createProgram()
   gl.attachShader(program, vertex)
   gl.attachShader(program, fragment)
   gl.linkProgram(program)
@@ -44,9 +44,9 @@ tape('mapbox-ansis', function (t) {
   }
 
   // Attribute and uniform locations
-  var aPosition = gl.getAttribLocation(program, 'a_position')
-  var uColor = gl.getUniformLocation(program, 'u_color')
-  var uZ = gl.getUniformLocation(program, 'u_z')
+  const aPosition = gl.getAttribLocation(program, 'a_position')
+  const uColor = gl.getUniformLocation(program, 'u_color')
+  const uZ = gl.getUniformLocation(program, 'u_z')
 
   // Set up framebuffer
   gl.renderbuffer = gl.createRenderbuffer()
@@ -57,7 +57,7 @@ tape('mapbox-ansis', function (t) {
   gl.bindRenderbuffer(gl.RENDERBUFFER, gl.depthStencilBuffer)
   gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, gl.drawingBufferWidth, gl.drawingBufferHeight)
 
-  var fbo = gl.createFramebuffer()
+  const fbo = gl.createFramebuffer()
   gl.bindFramebuffer(gl.FRAMEBUFFER, fbo)
   gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, gl.renderbuffer)
   gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, gl.depthStencilBuffer)
@@ -74,7 +74,7 @@ tape('mapbox-ansis', function (t) {
 
   // Create a buffer and put a single clipspace rectangle in
   // it (2 triangles)
-  var buffer = gl.createBuffer()
+  const buffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.bufferData(
     gl.ARRAY_BUFFER,
@@ -114,7 +114,7 @@ tape('mapbox-ansis', function (t) {
   // The blue rectangle gets drawn because 0.5 <= 0.5
 
   // Write output
-  var pixels = new Uint8Array(width * height * 4)
+  const pixels = new Uint8Array(width * height * 4)
   gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
 
   t.equals(pixels[0], 0)

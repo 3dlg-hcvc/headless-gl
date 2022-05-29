@@ -1,4 +1,4 @@
-var BLACKLIST = [
+const BLACKLIST = [
   // This test is really fiddly.  It relies on some weird antialiasing behavior
   // for GL_LINES
   'uniforms_out-of-bounds-uniform-array-access',
