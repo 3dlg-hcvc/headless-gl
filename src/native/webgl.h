@@ -14,6 +14,7 @@
 #include <EGL/eglext.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+#define GL_HALF_FLOAT                     0x140B         // AXC: from GLES3/gl3.h
 
 enum GLObjectType {
   GLOBJECT_TYPE_BUFFER,

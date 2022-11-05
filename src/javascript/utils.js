@@ -83,6 +83,8 @@ function typeSize (type) {
       return 1
     case gl.UNSIGNED_SHORT:
     case gl.SHORT:
+    case gl.HALF_FLOAT:
+    case gl.HALF_FLOAT_OES:
       return 2
     case gl.UNSIGNED_INT:
     case gl.INT:
@@ -111,6 +113,8 @@ function uniformTypeSize (type) {
 
     case gl.BOOL:
     case gl.INT:
+    case gl.HALF_FLOAT:
+    case gl.HALF_FLOAT_OES:
     case gl.FLOAT:
     case gl.SAMPLER_2D:
     case gl.SAMPLER_CUBE:

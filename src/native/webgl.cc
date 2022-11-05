@@ -817,9 +817,12 @@ unsigned char* WebGLRenderingContext::unpackPixels(
 
   //Compute pixel size
   GLint pixelSize = 1;
-  if(type == GL_UNSIGNED_BYTE || type == GL_FLOAT) {
+  if(type == GL_UNSIGNED_BYTE || type == GL_FLOAT || type == GL_HALF_FLOAT || type == GL_HALF_FLOAT_OES) {
     if(type == GL_FLOAT) {
       pixelSize = 4;
+    }
+    if(type == GL_HALF_FLOAT || type == GL_HALF_FLOAT_OES) {
+      pixelSize = 2;
     }
     switch(format) {
       case GL_ALPHA:
@@ -951,6 +954,9 @@ GL_METHOD(TexImage2D) {
     size_t length = width * height * 4;
     if(type == GL_FLOAT) {
       length *= 4;
+    }
+    if(type == GL_HALF_FLOAT || type == GL_HALF_FLOAT_OES) {
+      length *= 2;
     }
     char* data = new char[length];
     memset(data, 0, length);

@@ -7,6 +7,8 @@ const { getOESElementIndexUint } = require('./extensions/oes-element-index-unit'
 const { getOESStandardDerivatives } = require('./extensions/oes-standard-derivatives')
 const { getOESTextureFloat } = require('./extensions/oes-texture-float')
 const { getOESTextureFloatLinear } = require('./extensions/oes-texture-float-linear')
+const { getOESTextureHalfFloat } = require('./extensions/oes-texture-half-float')
+const { getOESTextureHalfFloatLinear } = require('./extensions/oes-texture-half-float-linear')
 const { getSTACKGLDestroyContext } = require('./extensions/stackgl-destroy-context')
 const { getSTACKGLResizeDrawingBuffer } = require('./extensions/stackgl-resize-drawing-buffer')
 const { getWebGLDrawBuffers } = require('./extensions/webgl-draw-buffers')
@@ -59,6 +61,8 @@ const availableExtensions = {
   oes_element_index_uint: getOESElementIndexUint,
   oes_texture_float: getOESTextureFloat,
   oes_texture_float_linear: getOESTextureFloatLinear,
+  oes_texture_half_float: getOESTextureHalfFloat,
+  oes_texture_half_float_linear: getOESTextureHalfFloatLinear,
   oes_standard_derivatives: getOESStandardDerivatives,
   oes_vertex_array_object: getOESVertexArrayObject,
   stackgl_destroy_context: getSTACKGLDestroyContext,
@@ -333,6 +337,8 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
         }
         return 2
       case gl.FLOAT:
+      case gl.HALF_FLOAT:
+      case gl.HALF_FLOAT_OES:
         return 1
     }
     this.setError(gl.INVALID_ENUM)
@@ -512,7 +518,7 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
       const colorAttachment = attachments[colorAttachments[i]]
       if (colorAttachment instanceof WebGLTexture) {
         if (colorAttachment._format !== gl.RGBA ||
-          !(colorAttachment._type === gl.UNSIGNED_BYTE || colorAttachment._type === gl.FLOAT)) {
+          !(colorAttachment._type === gl.UNSIGNED_BYTE || colorAttachment._type === gl.FLOAT || colorAttachment._type === gl.HALF_FLOAT || colorAttachment._type === gl.HALF_FLOAT_OES)) {
           return gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT
         }
         colorAttached = true
@@ -819,6 +825,13 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
 
     // oes_texture_float but not oes_texture_float_linear
     if (this._extensions.oes_texture_float && !this._extensions.oes_texture_float_linear && texture && texture._type === gl.FLOAT && (pname === gl.TEXTURE_MAG_FILTER || pname === gl.TEXTURE_MIN_FILTER) && (param === gl.LINEAR || param === gl.LINEAR_MIPMAP_NEAREST || param === gl.NEAREST_MIPMAP_LINEAR || param === gl.LINEAR_MIPMAP_LINEAR)) {
+      texture._complete = false
+      this.bindTexture(target, texture)
+      return
+    }
+
+    // oes_texture_float but not oes_texture_half_float_linear
+    if (this._extensions.oes_texture_half_float && !this._extensions.oes_texture_half_float_linear && texture && (texture._type === gl.HALF_FLOAT || texture._type === gl.HALF_FLOAT_OES) && (pname === gl.TEXTURE_MAG_FILTER || pname === gl.TEXTURE_MIN_FILTER) && (param === gl.LINEAR || param === gl.LINEAR_MIPMAP_NEAREST || param === gl.NEAREST_MIPMAP_LINEAR || param === gl.LINEAR_MIPMAP_LINEAR)) {
       texture._complete = false
       this.bindTexture(target, texture)
       return
@@ -1209,6 +1222,14 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
 
     if (supportedExts.indexOf('GL_OES_texture_float_linear') >= 0) {
       exts.push('OES_texture_float_linear')
+    }
+
+    if (supportedExts.indexOf('GL_OES_texture_half_float') >= 0) {
+      exts.push('OES_texture_half_float')
+    }
+
+    if (supportedExts.indexOf('GL_OES_texture_half_float_linear') >= 0) {
+      exts.push('OES_texture_half_float_linear')
     }
 
     if (supportedExts.indexOf('EXT_draw_buffers') >= 0) {
@@ -2590,6 +2611,8 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
       }
       switch (location._activeInfo.type) {
         case gl.FLOAT:
+        case gl.HALF_FLOAT:
+        case gl.HALF_FLOAT_OES:
           return data[0]
         case gl.FLOAT_VEC2:
           return new Float32Array(data.slice(0, 2))
@@ -3177,6 +3200,11 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
       return
     }
 
+    if ((type === gl.HALF_FLOAT || type === gl.HALF_FLOAT_OES) && !this._extensions.oes_texture_half_float) {
+      this.setError(gl.INVALID_ENUM)
+      return
+    }
+
     const texture = this._getTexImage(target)
     if (!texture || format !== internalFormat) {
       this.setError(gl.INVALID_OPERATION)
@@ -3296,6 +3324,11 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
     }
 
     if (type === gl.FLOAT && !this._extensions.oes_texture_float) {
+      this.setError(gl.INVALID_ENUM)
+      return
+    }
+
+    if ((type === gl.HALF_FLOAT || type === gl.HALF_FLOAT_OES) && !this._extensions.oes_texture_half_float) {
       this.setError(gl.INVALID_ENUM)
       return
     }
