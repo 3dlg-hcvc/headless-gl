@@ -1325,7 +1325,7 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
 
     if (typeof data === 'object') {
       let u8Data = null
-      if (isTypedArray(data)) {
+      if (isTypedArray(data) || data instanceof DataView) {
         u8Data = unpackTypedArray(data)
       } else if (data instanceof ArrayBuffer) {
         u8Data = new Uint8Array(data)
@@ -1407,7 +1407,7 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
     }
 
     let u8Data = null
-    if (isTypedArray(data)) {
+    if (isTypedArray(data) || data instanceof DataView) {
       u8Data = unpackTypedArray(data)
     } else if (data instanceof ArrayBuffer) {
       u8Data = new Uint8Array(data)
